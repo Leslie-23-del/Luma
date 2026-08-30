@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mis Pendientes</title>
+
+<style>
+
+:root{
+    --bg:#f7f4f0;
+    --card:#ffffff;
+    --text:#393633;
+    --muted:#9b938c;
+    --border:#e8e1db;
+    --shadow:0 8px 25px rgba(50,40,30,.06);
+    --danger:#b75b5b;
+}
+
+body.dark{
+    --bg:#191918;
+    --card:#252523;
+    --text:#f3eee8;
+    --muted:#aaa39b;
+    --border:#3a3835;
+    --shadow:0 8px 25px rgba(0,0,0,.25);
+    --danger:#e27b7b;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+button,input,select,textarea{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    max-width:520px;
+    min-height:100vh;
+    margin:auto;
+    padding:25px 20px 110px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.small{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:5px;
+}
+
+.title{
+    margin:0;
+    font-size:30px;
+}
+
+.theme{
+    width:43px;
+    height:43px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    font-size:18px;
+}
+
+.summary{
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    border-radius:25px;
+    padding:22px;
+    margin-bottom:28px;
+}
+
+.summary-label{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.summary-number{
+    font-size:42px;
+    font-weight:bold;
+    margin:5px 0;
+}
+
+.summary-text{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.section-title{
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    margin:25px 3px 12px;
+}
+
+.category{
+    display:flex;
+    align-items:center;
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    border-radius:20px;
+    padding:14px;
+    margin-bottom:10px;
+}
+
+.category-main{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    flex:1;
+    cursor:pointer;
+}
+
+.category-icon{
+    width:47px;
+    height:47px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+}
+
+.category-name{
+    font-size:15px;
+    font-weight:500;
+}
+
+.category-info{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:4px;
+}
+
+.arrow{
+    font-size:22px;
+    color:var(--muted);
+    margin-left:8px;
+}
+
+.delete-category-btn{
+    width:35px;
+    height:35px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-size:16px;
+    border-radius:50%;
+}
+
+.delete-category-btn:hover{
+    background:rgba(183,91,91,.1);
+    color:var(--danger);
+}
+
+.outline-btn{
+    width:100%;
+    padding:15px;
+    border-radius:18px;
+    border:1px dashed var(--border);
+    background:transparent;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    margin-bottom:9px;
+}
+
+.check{
+    width:22px;
+    height:22px;
+    min-width:22px;
+    border-radius:50%;
+    border:1.5px solid var(--muted);
+    cursor:pointer;
+}
+
+.check.done{
+    background:var(--text);
+}
+
+.check.done::after{
+    content:"✓";
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100%;
+    color:var(--bg);
+    font-size:12px;
+}
+
+.task-info{
+    flex:1;
+}
+
+.task-name{
+    font-size:14px;
+}
+
+.task-meta{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:4px;
+}
+
+.delete-btn{
+    border:none;
+    background:transparent;
+    font-size:16px;
+    color:var(--muted);
+}
+
+.screen{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:100;
+    overflow-y:auto;
+    background:var(--bg);
+    padding:25px 20px 110px;
+}
+
+.screen.active{
+    display:block;
+}
+
+.screen-inner{
+    max-width:520px;
+    margin:auto;
+}
+
+.back{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    font-size:20px;
+}
+
+.category-screen-head{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.category-screen-info{
+    flex:1;
+}
+
+.big-category-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:27px;
+}
+
+.delete-screen-category{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--danger);
+    font-size:17px;
+}
+
+.subcategory{
+    display:flex;
+    align-items:center;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:15px;
+    margin-bottom:9px;
+}
+
+.subcategory-main{
+    flex:1;
+    cursor:pointer;
+}
+
+.subcategory-name{
+    font-size:14px;
+    font-weight:500;
+}
+
+.delete-subcategory-btn{
+    width:35px;
+    height:35px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-size:15px;
+    border-radius:50%;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:300;
+    background:rgba(0,0,0,.4);
+    align-items:flex-end;
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-content{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+    max-height:92vh;
+    overflow-y:auto;
+    background:var(--card);
+    border-radius:28px 28px 0 0;
+    padding:24px 21px 30px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.modal-title{
+    margin:0 0 20px;
+    font-size:22px;
+}
+
+.close{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background:var(--bg);
+    color:var(--text);
+    font-size:22px;
+}
+
+label{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin:17px 0 7px;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+}
+
+textarea{
+    min-height:80px;
+}
+
+.icon-options{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:7px;
+}
+
+.icon-option{
+    padding:10px;
+    border-radius:13px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    font-size:18px;
+}
+
+.icon-option.selected{
+    border:2px solid var(--text);
+}
+
+.choice{
+    display:flex;
+    gap:10px;
+}
+
+.choice button{
+    flex:1;
+    padding:13px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+}
+
+.choice button.selected{
+    border:2px solid var(--text);
+}
+
+.priority{
+    display:flex;
+    gap:7px;
+}
+
+.priority button{
+    flex:1;
+    padding:11px 4px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+    font-size:11px;
+}
+
+.priority button.selected{
+    border:2px solid var(--text);
+}
+
+.save{
+    width:100%;
+    padding:16px;
+    margin-top:22px;
+    border:none;
+    border-radius:16px;
+    background:var(--text);
+    color:var(--bg);
+    font-size:14px;
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:30px 15px;
+    font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="header">
+
+        <div>
+            <div class="small">Hola ♡</div>
+            <h1 class="title">Mis pendientes</h1>
+        </div>
+
+        <button class="theme" onclick="toggleTheme()" id="themeButton">
+            ☾
+        </button>
+
+    </div>
+
+    <div class="summary">
+
+        <div class="summary-label">
+            Pendientes por hacer
+        </div>
+
+        <div class="summary-number" id="total">
+            0
+        </div>
+
+        <div class="summary-text">
+            Un paso a la vez ✦
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Mis categorías
+    </div>
+
+    <div id="categories"></div>
+
+    <button class="outline-btn" onclick="openCategoryModal()">
+        ＋ Crear nueva categoría
+    </button>
+
+    <div class="section-title">
+        Pendientes recientes
+    </div>
+
+    <div id="tasks"></div>
+
+</div>
+
+
+<button class="add-button" onclick="openTaskModal()">
+    +
+</button>
+
+
+<!-- PANTALLA CATEGORIA -->
+
+<div class="screen" id="categoryScreen">
+
+    <div class="screen-inner">
+
+        <div class="category-screen-head">
+
+            <button class="back" onclick="closeCategoryScreen()">
+                ←
+            </button>
+
+            <div class="big-category-icon" id="screenCategoryIcon">
+                🎓
+            </div>
+
+            <div class="category-screen-info">
+
+                <div class="small">
+                    CATEGORÍA
+                </div>
+
+                <h1 class="title" id="screenCategoryTitle">
+                    Categoría
+                </h1>
+
+            </div>
+
+            <button class="delete-screen-category"
+                    onclick="deleteCurrentCategory()">
+                🗑
+            </button>
+
+        </div>
+
+
+        <div id="subSection">
+
+            <div class="section-title">
+                Subcategorías
+            </div>
+
+            <div id="subcategories"></div>
+
+            <button class="outline-btn"
+                    onclick="openSubcategoryModal()">
+
+                ＋ Agregar subcategoría
+
+            </button>
+
+        </div>
+
+
+        <div id="directTasksSection">
+
+            <div class="section-title">
+                Pendientes
+            </div>
+
+            <div id="categoryTasks"></div>
+
+            <button class="outline-btn"
+                    onclick="openTaskModal(currentCategory)">
+
+                ＋ Nuevo pendiente
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PANTALLA SUBCATEGORIA -->
+
+<div class="screen" id="subcategoryScreen">
+
+    <div class="screen-inner">
+
+        <div class="category-screen-head">
+
+            <button class="back"
+                    onclick="closeSubcategoryScreen()">
+
+                ←
+
+            </button>
+
+            <div class="big-category-icon">
+                📂
+            </div>
+
+            <div class="category-screen-info">
+
+                <div class="small"
+                     id="parentCategoryName">
+
+                    CATEGORÍA
+
+                </div>
+
+                <h1 class="title"
+                    id="screenSubcategoryTitle">
+
+                    Subcategoría
+
+                </h1>
+
+            </div>
+
+            <button class="delete-screen-category"
+                    onclick="deleteCurrentSubcategory()">
+
+                🗑
+
+            </button>
+
+        </div>
+
+
+        <div class="section-title">
+            Pendientes
+        </div>
+
+        <div id="subcategoryTasks"></div>
+
+        <button class="outline-btn"
+                onclick="openTaskModal(currentCategory,currentSubcategory)">
+
+            ＋ Nuevo pendiente
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL CATEGORIA -->
+
+<div class="modal" id="categoryModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2 class="modal-title">
+                Nueva categoría
+            </h2>
+
+            <button class="close"
+                    onclick="closeCategoryModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <label>
+            Nombre de la categoría
+        </label>
+
+        <input id="categoryName"
+               type="text"
+               placeholder="Ej. Universidad">
+
+
+        <label>
+            Icono
+        </label>
+
+        <div class="icon-options">
+
+            <button class="icon-option selected"
+                    onclick="selectIcon(this,'🎓')">
+                🎓
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'💼')">
+                💼
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'📚')">
+                📚
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'🏠')">
+                🏠
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'💰')">
+                💰
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'💻')">
+                💻
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'📝')">
+                📝
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'⭐')">
+                ⭐
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'🌱')">
+                🌱
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'🎨')">
+                🎨
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'💡')">
+                💡
+            </button>
+
+            <button class="icon-option"
+                    onclick="selectIcon(this,'♡')">
+                ♡
+            </button>
+
+        </div>
+
+
+        <label>
+            ¿Quieres usar subcategorías?
+        </label>
+
+        <div class="choice">
+
+            <button id="choiceNo"
+                    class="selected"
+                    onclick="chooseSubcategories(false)">
+
+                No
+
+            </button>
+
+            <button id="choiceYes"
+                    onclick="chooseSubcategories(true)">
+
+                Sí
+
+            </button>
+
+        </div>
+
+
+        <button class="save"
+                onclick="saveCategory()">
+
+            Crear categoría ♡
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL SUBCATEGORIA -->
+
+<div class="modal" id="subcategoryModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2 class="modal-title">
+                Nueva subcategoría
+            </h2>
+
+            <button class="close"
+                    onclick="closeSubcategoryModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <label>
+            Nombre de la subcategoría
+        </label>
+
+        <input id="subcategoryName"
+               type="text"
+               placeholder="Ej. Contabilidad">
+
+
+        <button class="save"
+                onclick="saveSubcategory()">
+
+            Guardar subcategoría
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL PENDIENTE -->
+
+<div class="modal" id="taskModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2 class="modal-title">
+                Nuevo pendiente
+            </h2>
+
+            <button class="close"
+                    onclick="closeTaskModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <label>
+            ¿Qué tienes que hacer?
+        </label>
+
+        <input id="taskName"
+               type="text"
+               placeholder="Escribe tu pendiente...">
+
+
+        <div id="taskCategoryContainer">
+
+            <label>
+                Categoría
+            </label>
+
+            <select id="taskCategory"
+                    onchange="updateSubcategoryField()">
+            </select>
+
+        </div>
+
+
+        <div id="taskSubcategoryContainer">
+
+            <label>
+                Subcategoría
+            </label>
+
+            <select id="taskSubcategory">
+            </select>
+
+        </div>
+
+
+        <label>
+            Fecha
+        </label>
+
+        <input id="taskDate"
+               type="date">
+
+
+        <label>
+            Prioridad
+        </label>
+
+        <div class="priority">
+
+            <button class="selected"
+                    onclick="selectPriority(this,'Media')">
+
+                🟡 Media
+
+            </button>
+
+            <button onclick="selectPriority(this,'Alta')">
+
+                🔴 Alta
+
+            </button>
+
+            <button onclick="selectPriority(this,'Baja')">
+
+                🟢 Baja
+
+            </button>
+
+        </div>
+
+
+        <label>
+            Nota
+        </label>
+
+        <textarea id="taskNote"
+                  placeholder="Algún detalle adicional...">
+        </textarea>
+
+
+        <button class="save"
+                onclick="saveTask()">
+
+            Guardar pendiente ♡
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   DATOS
+========================= */
+
+let categories =
+JSON.parse(localStorage.getItem("categories")) || [];
+
+let tasks =
+JSON.parse(localStorage.getItem("tasks")) || [];
+
+let selectedIcon = "🎓";
+let selectedPriority = "Media";
+let useSubcategories = false;
+
+let currentCategory = null;
+let currentSubcategory = null;
+
+
+/* =========================
+   GUARDAR
+========================= */
+
+function saveData(){
+
+    localStorage.setItem(
+        "categories",
+        JSON.stringify(categories)
+    );
+
+    localStorage.setItem(
+        "tasks",
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+function toggleTheme(){
+
+    document.body.classList.toggle("dark");
+
+    const dark =
+    document.body.classList.contains("dark");
+
+    document.getElementById("themeButton").textContent =
+    dark ? "☀" : "☾";
+
+    localStorage.setItem(
+        "theme",
+        dark ? "dark" : "light"
+    );
+
+}
+
+if(localStorage.getItem("theme") === "dark"){
+
+    document.body.classList.add("dark");
+
+    document.getElementById("themeButton").textContent =
+    "☀";
+
+}
+
+
+/* =========================
+   ICONOS
+========================= */
+
+function selectIcon(button,icon){
+
+    document.querySelectorAll(".icon-option")
+    .forEach(function(b){
+
+        b.classList.remove("selected");
+
+    });
+
+    button.classList.add("selected");
+
+    selectedIcon = icon;
+
+}
+
+
+/* =========================
+   SUBCATEGORIAS
+========================= */
+
+function chooseSubcategories(value){
+
+    useSubcategories = value;
+
+    document.getElementById("choiceNo")
+    .classList.toggle("selected",!value);
+
+    document.getElementById("choiceYes")
+    .classList.toggle("selected",value);
+
+}
+
+
+/* =========================
+   MODAL CATEGORIA
+========================= */
+
+function openCategoryModal(){
+
+    document.getElementById("categoryModal")
+    .classList.add("active");
+
+}
+
+function closeCategoryModal(){
+
+    document.getElementById("categoryModal")
+    .classList.remove("active");
+
+}
+
+
+/* =========================
+   CREAR CATEGORIA
+========================= */
+
+function saveCategory(){
+
+    const name =
+    document.getElementById("categoryName")
+    .value
+    .trim();
+
+    if(!name){
+
+        alert("Escribe un nombre para la categoría.");
+
+        return;
+
+    }
+
+    categories.push({
+
+        id:Date.now(),
+
+        name:name,
+
+        icon:selectedIcon,
+
+        hasSubcategories:useSubcategories,
+
+        subcategories:[]
+
+    });
+
+    saveData();
+
+    renderCategories();
+
+    closeCategoryModal();
+
+    document.getElementById("categoryName").value = "";
+
+}
+
+
+/* =========================
+   ELIMINAR CATEGORIA
+========================= */
+
+function deleteCategory(id){
+
+    const category = categories.find(function(c){
+
+        return c.id === id;
+
+    });
+
+    if(!category) return;
+
+    const confirmation = confirm(
+        "¿Seguro que quieres eliminar la categoría \"" +
+        category.name +
+        "\"?\n\nTambién se eliminarán todos sus pendientes y subcategorías."
+    );
+
+    if(!confirmation) return;
+
+
+    categories = categories.filter(function(category){
+
+        return category.id !== id;
+
+    });
+
+
+    tasks = tasks.filter(function(task){
+
+        return task.categoryId !== id;
+
+    });
+
+
+    saveData();
+
+    renderCategories();
+    renderTasks();
+
+}
+
+
+/* ELIMINAR DESDE PANTALLA */
+
+function deleteCurrentCategory(){
+
+    if(!currentCategory) return;
+
+    const id = currentCategory;
+
+    deleteCategory(id);
+
+    document.getElementById("categoryScreen")
+    .classList.remove("active");
+
+    currentCategory = null;
+
+}
+
+
+/* =========================
+   MOSTRAR CATEGORIAS
+========================= */
+
+function renderCategories(){
+
+    const container =
+    document.getElementById("categories");
+
+    container.innerHTML = "";
+
+    if(categories.length === 0){
+
+        container.innerHTML =
+        '<div class="empty">Todavía no tienes categorías ♡</div>';
+
+        updateTotal();
+
+        return;
+
+    }
+
+    categories.forEach(function(category){
+
+        const count = tasks.filter(function(task){
+
+            return task.categoryId === category.id &&
+                   !task.done;
+
+        }).length;
+
+
+        const div =
+        document.createElement("div");
+
+        div.className = "category";
+
+
+        div.innerHTML = `
+
+            <div class="category-main"
+                 onclick="openCategoryScreen(${category.id})">
+
+                <div class="category-icon"
+                     style="background:${getIconBackground(category.icon)}">
+
+                    ${category.icon}
+
+                </div>
+
+                <div>
+
+                    <div class="category-name">
+
+                        ${escapeHTML(category.name)}
+
+                    </div>
+
+                    <div class="category-info">
+
+                        ${count}
+                        pendiente${count !== 1 ? "s" : ""}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="delete-category-btn"
+                    onclick="deleteCategory(${category.id})">
+
+                🗑
+
+            </button>
+
+            <div class="arrow"
+                 onclick="openCategoryScreen(${category.id})">
+
+                ›
+
+            </div>
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+    updateTotal();
+
+}
+
+
+/* =========================
+   COLOR ICONOS
+========================= */
+
+function getIconBackground(icon){
+
+    const backgrounds = {
+
+        "🎓":"#eee7f3",
+        "💼":"#e5eee9",
+        "📚":"#eee9df",
+        "🏠":"#f1e5dc",
+        "💰":"#e8eddf",
+        "💻":"#e3e9ef",
+        "📝":"#ebe7dd",
+        "⭐":"#eee8d5",
+        "🌱":"#e2eee4",
+        "🎨":"#eee3ed",
+        "💡":"#f0ead6",
+        "♡":"#f1e3e8"
+
+    };
+
+    return backgrounds[icon] || "#eee9e3";
+
+}
+
+
+/* =========================
+   ABRIR CATEGORIA
+========================= */
+
+function openCategoryScreen(id){
+
+    currentCategory = id;
+
+    currentSubcategory = null;
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === id;
+
+    });
+
+    if(!category) return;
+
+
+    document.getElementById("screenCategoryIcon")
+    .textContent =
+    category.icon;
+
+
+    document.getElementById("screenCategoryIcon")
+    .style.background =
+    getIconBackground(category.icon);
+
+
+    document.getElementById("screenCategoryTitle")
+    .textContent =
+    category.name;
+
+
+    if(category.hasSubcategories){
+
+        document.getElementById("subSection")
+        .style.display = "block";
+
+        document.getElementById("directTasksSection")
+        .style.display = "none";
+
+        renderSubcategories();
+
+    }else{
+
+        document.getElementById("subSection")
+        .style.display = "none";
+
+        document.getElementById("directTasksSection")
+        .style.display = "block";
+
+        renderCategoryTasks();
+
+    }
+
+
+    document.getElementById("categoryScreen")
+    .classList.add("active");
+
+}
+
+
+function closeCategoryScreen(){
+
+    document.getElementById("categoryScreen")
+    .classList.remove("active");
+
+    currentCategory = null;
+
+}
+
+
+/* =========================
+   SUBCATEGORIAS
+========================= */
+
+function openSubcategoryModal(){
+
+    document.getElementById("subcategoryModal")
+    .classList.add("active");
+
+}
+
+function closeSubcategoryModal(){
+
+    document.getElementById("subcategoryModal")
+    .classList.remove("active");
+
+}
+
+
+function saveSubcategory(){
+
+    const name =
+    document.getElementById("subcategoryName")
+    .value
+    .trim();
+
+    if(!name){
+
+        alert("Escribe un nombre.");
+
+        return;
+
+    }
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === currentCategory;
+
+    });
+
+    if(!category) return;
+
+
+    if(category.subcategories.includes(name)){
+
+        alert("Esta subcategoría ya existe.");
+
+        return;
+
+    }
+
+
+    category.subcategories.push(name);
+
+    saveData();
+
+    renderSubcategories();
+
+    closeSubcategoryModal();
+
+    document.getElementById("subcategoryName").value = "";
+
+}
+
+
+/* =========================
+   ELIMINAR SUBCATEGORIA
+========================= */
+
+function deleteSubcategory(name){
+
+    if(!currentCategory) return;
+
+    const confirmation = confirm(
+
+        "¿Seguro que quieres eliminar la subcategoría \"" +
+        name +
+        "\"?\n\nTambién se eliminarán todos los pendientes que contiene."
+
+    );
+
+    if(!confirmation) return;
+
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === currentCategory;
+
+    });
+
+
+    if(!category) return;
+
+
+    category.subcategories =
+    category.subcategories.filter(function(sub){
+
+        return sub !== name;
+
+    });
+
+
+    tasks = tasks.filter(function(task){
+
+        return !(
+            task.categoryId === currentCategory &&
+            task.subcategory === name
+        );
+
+    });
+
+
+    saveData();
+
+    renderSubcategories();
+    renderTasks();
+    renderCategories();
+
+}
+
+
+/* ELIMINAR SUBCATEGORIA ACTUAL */
+
+function deleteCurrentSubcategory(){
+
+    if(!currentSubcategory) return;
+
+    const name = currentSubcategory;
+
+    const confirmation = confirm(
+
+        "¿Seguro que quieres eliminar la subcategoría \"" +
+        name +
+        "\"?\n\nTambién se eliminarán todos sus pendientes."
+
+    );
+
+    if(!confirmation) return;
+
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === currentCategory;
+
+    });
+
+
+    if(!category) return;
+
+
+    category.subcategories =
+    category.subcategories.filter(function(sub){
+
+        return sub !== name;
+
+    });
+
+
+    tasks = tasks.filter(function(task){
+
+        return !(
+
+            task.categoryId === currentCategory &&
+            task.subcategory === name
+
+        );
+
+    });
+
+
+    saveData();
+
+    document.getElementById("subcategoryScreen")
+    .classList.remove("active");
+
+    currentSubcategory = null;
+
+    renderSubcategories();
+    renderCategories();
+    renderTasks();
+
+}
+
+
+/* =========================
+   MOSTRAR SUBCATEGORIAS
+========================= */
+
+function renderSubcategories(){
+
+    const container =
+    document.getElementById("subcategories");
+
+    container.innerHTML = "";
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === currentCategory;
+
+    });
+
+
+    if(!category ||
+       category.subcategories.length === 0){
+
+        container.innerHTML =
+        '<div class="empty">Crea una subcategoría para comenzar ♡</div>';
+
+        return;
+
+    }
+
+
+    category.subcategories.forEach(function(sub){
+
+        const count =
+        tasks.filter(function(task){
+
+            return task.categoryId === category.id &&
+                   task.subcategory === sub &&
+                   !task.done;
+
+        }).length;
+
+
+        const div =
+        document.createElement("div");
+
+        div.className = "subcategory";
+
+
+        div.innerHTML = `
+
+            <div class="subcategory-main"
+                 onclick="openSubcategoryScreen('${escapeJS(sub)}')">
+
+                <div class="subcategory-name">
+
+                    📂 ${escapeHTML(sub)}
+
+                </div>
+
+                <div class="category-info">
+
+                    ${count}
+                    pendiente${count !== 1 ? "s" : ""}
+
+                </div>
+
+            </div>
+
+            <button class="delete-subcategory-btn"
+                    onclick="deleteSubcategory('${escapeJS(sub)}')">
+
+                🗑
+
+            </button>
+
+            <div class="arrow"
+                 onclick="openSubcategoryScreen('${escapeJS(sub)}')">
+
+                ›
+
+            </div>
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================
+   ABRIR SUBCATEGORIA
+========================= */
+
+function openSubcategoryScreen(subcategory){
+
+    currentSubcategory = subcategory;
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === currentCategory;
+
+    });
+
+    if(!category) return;
+
+
+    document.getElementById("parentCategoryName")
+    .textContent =
+    category.name.toUpperCase();
+
+
+    document.getElementById("screenSubcategoryTitle")
+    .textContent =
+    subcategory;
+
+
+    renderSubcategoryTasks();
+
+
+    document.getElementById("subcategoryScreen")
+    .classList.add("active");
+
+}
+
+
+function closeSubcategoryScreen(){
+
+    document.getElementById("subcategoryScreen")
+    .classList.remove("active");
+
+    currentSubcategory = null;
+
+}
+
+
+/* =========================
+   MODAL PENDIENTE
+========================= */
+
+function openTaskModal(categoryId = null, subcategory = null){
+
+    if(categories.length === 0){
+
+        alert("Primero crea una categoría.");
+
+        return;
+
+    }
+
+
+    renderTaskCategories();
+
+
+    document.getElementById("taskName").value = "";
+    document.getElementById("taskDate").value = "";
+    document.getElementById("taskNote").value = "";
+
+
+    selectedPriority = "Media";
+
+
+    document.querySelectorAll(".priority button")
+    .forEach(function(button){
+
+        button.classList.remove("selected");
+
+        if(button.textContent.includes("Media")){
+
+            button.classList.add("selected");
+
+        }
+
+    });
+
+
+    if(categoryId){
+
+        document.getElementById("taskCategory").value =
+        categoryId;
+
+    }
+
+
+    updateSubcategoryField();
+
+
+    if(subcategory){
+
+        document.getElementById("taskSubcategory").value =
+        subcategory;
+
+
+        document.getElementById("taskCategoryContainer")
+        .style.display = "none";
+
+
+        document.getElementById("taskSubcategoryContainer")
+        .style.display = "none";
+
+    }else{
+
+        document.getElementById("taskCategoryContainer")
+        .style.display = "block";
+
+    }
+
+
+    document.getElementById("taskModal")
+    .classList.add("active");
+
+}
+
+
+function closeTaskModal(){
+
+    document.getElementById("taskModal")
+    .classList.remove("active");
+
+}
+
+
+/* =========================
+   SELECT CATEGORIAS
+========================= */
+
+function renderTaskCategories(){
+
+    const select =
+    document.getElementById("taskCategory");
+
+    select.innerHTML = "";
+
+
+    categories.forEach(function(category){
+
+        const option =
+        document.createElement("option");
+
+        option.value = category.id;
+
+        option.textContent =
+        category.icon + " " + category.name;
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* =========================
+   SELECT SUBCATEGORIAS
+========================= */
+
+function updateSubcategoryField(){
+
+    const id =
+    Number(
+        document.getElementById("taskCategory").value
+    );
+
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === id;
+
+    });
+
+
+    const container =
+    document.getElementById("taskSubcategoryContainer");
+
+
+    const select =
+    document.getElementById("taskSubcategory");
+
+
+    if(!category ||
+       !category.hasSubcategories){
+
+        container.style.display = "none";
+
+        return;
+
+    }
+
+
+    if(category.subcategories.length === 0){
+
+        container.style.display = "none";
+
+        return;
+
+    }
+
+
+    container.style.display = "block";
+
+    select.innerHTML = "";
+
+
+    category.subcategories.forEach(function(sub){
+
+        const option =
+        document.createElement("option");
+
+        option.value = sub;
+
+        option.textContent = sub;
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* =========================
+   PRIORIDAD
+========================= */
+
+function selectPriority(button,priority){
+
+    document.querySelectorAll(".priority button")
+    .forEach(function(b){
+
+        b.classList.remove("selected");
+
+    });
+
+
+    button.classList.add("selected");
+
+    selectedPriority = priority;
+
+}
+
+
+/* =========================
+   GUARDAR PENDIENTE
+========================= */
+
+function saveTask(){
+
+    const name =
+    document.getElementById("taskName")
+    .value
+    .trim();
+
+
+    if(!name){
+
+        alert("Escribe tu pendiente.");
+
+        return;
+
+    }
+
+
+    const categoryId =
+    Number(
+        document.getElementById("taskCategory").value
+    );
+
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === categoryId;
+
+    });
+
+
+    let subcategory = "";
+
+
+    if(category &&
+       category.hasSubcategories &&
+       category.subcategories.length > 0){
+
+        subcategory =
+        document.getElementById("taskSubcategory").value;
+
+    }
+
+
+    tasks.push({
+
+        id:Date.now(),
+
+        name:name,
+
+        categoryId:categoryId,
+
+        subcategory:subcategory,
+
+        date:
+        document.getElementById("taskDate").value,
+
+        priority:selectedPriority,
+
+        note:
+        document.getElementById("taskNote").value.trim(),
+
+        done:false
+
+    });
+
+
+    saveData();
+
+    closeTaskModal();
+
+    renderCategories();
+    renderTasks();
+    renderCategoryTasks();
+    renderSubcategories();
+    renderSubcategoryTasks();
+
+}
+
+
+/* =========================
+   PENDIENTES PRINCIPALES
+========================= */
+
+function renderTasks(){
+
+    const container =
+    document.getElementById("tasks");
+
+    container.innerHTML = "";
+
+
+    const active =
+    tasks
+    .filter(function(task){
+
+        return !task.done;
+
+    })
+    .slice()
+    .reverse()
+    .slice(0,10);
+
+
+    if(active.length === 0){
+
+        container.innerHTML =
+        '<div class="empty">No tienes pendientes por ahora ♡</div>';
+
+        updateTotal();
+
+        return;
+
+    }
+
+
+    active.forEach(function(task){
+
+        container.appendChild(
+            createTaskElement(task)
+        );
+
+    });
+
+
+    updateTotal();
+
+}
+
+
+/* =========================
+   PENDIENTES CATEGORIA
+========================= */
+
+function renderCategoryTasks(){
+
+    const container =
+    document.getElementById("categoryTasks");
+
+    if(!container) return;
+
+    container.innerHTML = "";
+
+
+    if(!currentCategory) return;
+
+
+    const list =
+    tasks
+    .filter(function(task){
+
+        return task.categoryId === currentCategory &&
+               task.subcategory === "";
+
+    })
+    .slice()
+    .reverse();
+
+
+    if(list.length === 0){
+
+        container.innerHTML =
+        '<div class="empty">No tienes pendientes aquí ♡</div>';
+
+        return;
+
+    }
+
+
+    list.forEach(function(task){
+
+        container.appendChild(
+            createTaskElement(task)
+        );
+
+    });
+
+}
+
+
+/* =========================
+   PENDIENTES SUBCATEGORIA
+========================= */
+
+function renderSubcategoryTasks(){
+
+    const container =
+    document.getElementById("subcategoryTasks");
+
+    if(!container) return;
+
+    container.innerHTML = "";
+
+
+    if(!currentCategory ||
+       !currentSubcategory) return;
+
+
+    const list =
+    tasks
+    .filter(function(task){
+
+        return task.categoryId === currentCategory &&
+               task.subcategory === currentSubcategory;
+
+    })
+    .slice()
+    .reverse();
+
+
+    if(list.length === 0){
+
+        container.innerHTML =
+        '<div class="empty">No tienes pendientes aquí todavía ♡</div>';
+
+        return;
+
+    }
+
+
+    list.forEach(function(task){
+
+        container.appendChild(
+            createTaskElement(task)
+        );
+
+    });
+
+}
+
+
+/* =========================
+   CREAR TARJETA PENDIENTE
+========================= */
+
+function createTaskElement(task){
+
+    const div =
+    document.createElement("div");
+
+    div.className = "task";
+
+
+    const category =
+    categories.find(function(c){
+
+        return c.id === task.categoryId;
+
+    });
+
+
+    let meta =
+    category ? category.name : "";
+
+
+    if(task.subcategory){
+
+        meta += " · " + task.subcategory;
+
+    }
+
+
+    if(task.date){
+
+        meta += " · " +
+        formatDate(task.date);
+
+    }
+
+
+    meta += " · " + task.priority;
+
+
+    div.innerHTML = `
+
+        <div class="check ${task.done ? "done" : ""}"
+             onclick="event.stopPropagation(); toggleTask(${task.id})">
+        </div>
+
+        <div class="task-info">
+
+            <div class="task-name"
+                 style="${task.done ? "text-decoration:line-through;opacity:.5;" : ""}">
+
+                ${escapeHTML(task.name)}
+
+            </div>
+
+            <div class="task-meta">
+
+                ${escapeHTML(meta)}
+
+            </div>
+
+        </div>
+
+        <button class="delete-btn"
+                onclick="event.stopPropagation(); deleteTask(${task.id})">
+
+            🗑
+
+        </button>
+
+    `;
+
+    return div;
+
+}
+
+
+/* =========================
+   COMPLETAR PENDIENTE
+========================= */
+
+function toggleTask(id){
+
+    const task =
+    tasks.find(function(t){
+
+        return t.id === id;
+
+    });
+
+
+    if(!task) return;
+
+
+    task.done = !task.done;
+
+
+    saveData();
+
+
+    renderCategories();
+    renderTasks();
+    renderCategoryTasks();
+    renderSubcategories();
+    renderSubcategoryTasks();
+
+}
+
+
+/* =========================
+   ELIMINAR PENDIENTE
+========================= */
+
+function deleteTask(id){
+
+    const task =
+    tasks.find(function(t){
+
+        return t.id === id;
+
+    });
+
+
+    if(!task) return;
+
+
+    const confirmation =
+    confirm(
+        "¿Seguro que quieres eliminar este pendiente?"
+    );
+
+
+    if(!confirmation) return;
+
+
+    tasks =
+    tasks.filter(function(task){
+
+        return task.id !== id;
+
+    });
+
+
+    saveData();
+
+
+    renderCategories();
+    renderTasks();
+    renderCategoryTasks();
+    renderSubcategories();
+    renderSubcategoryTasks();
+
+}
+
+
+/* =========================
+   TOTAL
+========================= */
+
+function updateTotal(){
+
+    const total =
+    tasks.filter(function(task){
+
+        return !task.done;
+
+    }).length;
+
+
+    document.getElementById("total")
+    .textContent = total;
+
+}
+
+
+/* =========================
+   FECHA
+========================= */
+
+function formatDate(date){
+
+    const parts =
+    date.split("-");
+
+
+    return parts[2] + "/" +
+           parts[1] + "/" +
+           parts[0];
+
+}
+
+
+/* =========================
+   SEGURIDAD HTML
+========================= */
+
+function escapeHTML(text){
+
+    return String(text)
+
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function escapeJS(text){
+
+    return String(text)
+
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'");
+
+}
+
+
+/* =========================
+   INICIAR
+========================= */
+
+renderCategories();
+
+renderTasks();
+
+updateTotal();
+
+</script>
+
+</body>
+</html>
