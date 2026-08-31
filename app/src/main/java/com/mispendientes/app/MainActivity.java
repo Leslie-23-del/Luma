@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
 
 public class MainActivity extends Activity {
 
@@ -24,6 +25,9 @@ public class MainActivity extends Activity {
         settings.setDatabaseEnabled(true);
 
         webView.setWebViewClient(new WebViewClient());
+
+        // Permite alertas y confirmaciones de JavaScript
+        webView.setWebChromeClient(new WebChromeClient());
 
         webView.loadUrl("file:///android_asset/index.html");
 
